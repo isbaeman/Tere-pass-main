@@ -59,6 +59,8 @@ body::after{content:""; position:fixed; inset:calc(env(safe-area-inset-top,0px) 
 <body>
 <div id="stage"><p id="line" aria-live="polite"></p></div>
 <button id="start" type="button">شروع کریں</button>
+<!-- SONG: put your audio file next to this HTML file and set its name (or a full URL) in src -->
+<audio id="song" src="song.mp3" preload="auto"></audio>
 <script>
 const LYRICS=[
 "جیسے تُو ہے پاس میرے",
@@ -130,6 +132,8 @@ document.getElementById('start').addEventListener('click',e=>{
   e.stopPropagation();
   if(started) return;
   started=true; document.body.classList.add('started');
+  const song=document.getElementById('song');
+  if(song){ song.currentTime=0; const pr=song.play(); if(pr&&pr.catch) pr.catch(()=>{}); }
   (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>play(0));
 });
 </script>
