@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>جیسے تُو ہے پاس میرے</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;500&family=Gulzar&family=Scheherazade+New:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#0a0908; --ink:#f1e3c0; --gold:#c9a45c; --dim:rgba(201,164,92,.55);
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{
+  background:radial-gradient(ellipse at 50% 45%, #17130d 0%, #0a0908 55%, #050404 100%);
+  color:var(--ink); overflow:hidden; touch-action:none;
+  -webkit-user-select:none; user-select:none; cursor:pointer;
+  font-family:'Noto Nastaliq Urdu','Gulzar','Gulzar Nastaliq','Scheherazade New',serif;
+}
+#title{
+  position:fixed; top:calc(env(safe-area-inset-top,0px) + 22px); left:0; right:0;
+  text-align:center; color:var(--dim); font-size:clamp(1rem,2.6vw,1.3rem); line-height:2;
+}
+#stage{height:100%; display:flex; align-items:center; justify-content:center; padding:0 6vw}
+#line{
+  --p:0; margin:0; text-align:center; direction:rtl; unicode-bidi:plaintext;
+  font-size:clamp(1.8rem,5.8vw,3.7rem); line-height:2.5; padding:.75em .5em;
+  color:var(--ink); max-width:100%; font-weight:500; letter-spacing:0; word-spacing:.12em; font-style:italic; font-style:oblique 12deg; font-synthesis:style;
+  text-shadow:0 0 1px rgba(255,244,214,.7), 0 0 18px rgba(214,172,92,.38), 0 0 60px rgba(214,172,92,.16);
+  -webkit-mask-image:linear-gradient(to left,#000 calc(var(--p)*1% - 18%),transparent calc(var(--p)*1%));
+          mask-image:linear-gradient(to left,#000 calc(var(--p)*1% - 18%),transparent calc(var(--p)*1%));
+  transition:opacity .9s ease, filter .9s ease, transform .9s ease;
+}
+#line.out{opacity:0; filter:blur(5px); transform:translateY(-6px)}
+#bar{position:fixed; left:0; right:0; bottom:0; height:2px; background:rgba(201,164,92,.12)}
+#fill{height:100%; width:0; margin-left:auto; background:var(--gold); transition:width .6s ease}
+#ctrl{
+  position:fixed; left:0; right:0; bottom:calc(env(safe-area-inset-bottom,0px) + 18px);
+  display:flex; justify-content:center; gap:14px; opacity:.45; transition:opacity .3s;
+}
+#ctrl:hover,#ctrl:focus-within{opacity:1}
+button{
+  background:none; border:1px solid rgba(201,164,92,.4); color:var(--gold); border-radius:999px;
+  min-width:44px; height:38px; padding:0 16px; font:inherit; font-size:.95rem; cursor:pointer;
+}
+button:hover{background:rgba(201,164,92,.12)}
+button:focus-visible{outline:2px solid var(--gold); outline-offset:3px}
+@media (prefers-reduced-motion:reduce){#line{transition:opacity .4s}}
+#start{position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); height:52px; padding:0 34px; font-size:1.25rem; letter-spacing:0; box-shadow:0 0 28px rgba(201,164,92,.18); transition:opacity .6s ease}
+body.started #start{opacity:0; pointer-events:none}
+#stage{position:relative}
+#stage::before{content:""; position:absolute; left:50%; top:50%; width:min(90vw,820px); height:min(60vh,420px); transform:translate(-50%,-50%); background:radial-gradient(ellipse at center, rgba(214,172,92,.10), rgba(214,172,92,0) 68%); pointer-events:none; animation:breathe 9s ease-in-out infinite}
+@keyframes breathe{0%,100%{opacity:.55}50%{opacity:1}}
+body::after{content:""; position:fixed; inset:calc(env(safe-area-inset-top,0px) + 14px) 14px calc(env(safe-area-inset-bottom,0px) + 14px); border:1px solid rgba(201,164,92,.24); outline:1px solid rgba(201,164,92,.09); outline-offset:6px; border-radius:2px; pointer-events:none}
+@media (prefers-reduced-motion:reduce){#stage::before{animation:none}}
+</style>
+</head>
+<body>
+<div id="stage"><p id="line" aria-live="polite"></p></div>
+<button id="start" type="button">شروع کریں</button>
+<script>
+const LYRICS=[
+"جیسے تُو ہے پاس میرے",
+"تیرے پاس میں","جیسے شاموں کے سویرے","تیرے پاس میں","جیسے کاغذ پہ کوئی نظم لکھی ہے",
+"جیسے نیچی نظر میں شرم چھپی ہے","سانسوں میں رہتی نظم","جیسے تُو ہے پاس میرے","تیرے پاس میں",
+"جیسے شاموں کے سویرے","تیرے پاس میں","سانسوں میں لکھی / رہتی نظم","جیسے پانی پاس پیاسے",
+"تیرے پاس میں","جیسے دل کے ہیں دلاسے","تیرے پاس میں","جھوٹ ہیں یہ دوریاں","جھوٹ فاصلہ ہے",
+"تجھے روز مل رہا ہوں میں","بات ہو خیال میں","جیسے ہونٹوں میں ہو لالی","تیرے پاس میں",
+"جیسے کانوں میں ہو بالی","تیرے پاس میں","جیسے تُو ہے پاس میرے","تیرے پاس میں",
+"جیسے شاموں کے سویرے","تیرے پاس میں","اپنی کہانی اُتنی رہے گی","چاہے بڑھا لو چاہے گھٹا لو",
+"کاجل نہیں میں گالوں کا تل ہوں","مٹتا نہیں میں کتنا مٹا لو","میرا تو ہٹنا مشکل بڑا ہے",
+"تم سامنے سے شیشہ ہٹا لو","جیسے آنکھوں کے اشارے","تیرے پاس میں","جیسے ندیا کے کنارے","تیرے پاس میں"
+];
+if(LYRICS.length!==38) console.error("Expected 38 lines, got",LYRICS.length);
+
+/* 3600 + 1200 + 900 + 300 = 6000 ms per lyric */
+const REVEAL=3600, HOLD=1200, OUT=900, GAP=300;
+const el=document.getElementById('line');
+let run=0, paused=false, idx=0, done=false, started=false;
+
+function sleep(ms,id){
+  return new Promise(res=>{
+    let left=ms, last=performance.now();
+    (function tick(now){
+      if(id!==run) return res(false);
+      if(!paused) left-=now-last;
+      last=now;
+      left<=0 ? res(true) : requestAnimationFrame(tick);
+    })(last);
+  });
+}
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+
+async function reveal(id){
+  let t=0,last=performance.now();
+  while(t<1){
+    const now=await new Promise(r=>requestAnimationFrame(r));
+    if(id!==run) return false;
+    if(!paused) t=Math.min(1,t+(now-last)/REVEAL);
+    last=now;
+    el.style.setProperty('--p',(ease(t)*130).toFixed(2));
+  }
+  return true;
+}
+
+async function play(start){
+  const id=++run;
+  for(let i=start;i<LYRICS.length;i++){
+    idx=i;
+    el.classList.remove('out');
+    el.style.setProperty('--p',0);
+    el.textContent=LYRICS[i];
+    if(!await reveal(id)) return;
+    if(!await sleep(HOLD,id)) return;
+    el.classList.add('out');
+    if(!await sleep(OUT+GAP,id)) return;
+  }
+  if(id===run) done=true;
+}
+
+document.body.addEventListener('click',()=>{
+  if(!started) return;
+  const i=done?LYRICS.length-1:idx; done=false; play(i);
+});
+document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
+document.addEventListener('selectstart',e=>e.preventDefault());
+
+document.getElementById('start').addEventListener('click',e=>{
+  e.stopPropagation();
+  if(started) return;
+  started=true; document.body.classList.add('started');
+  (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>play(0));
+});
+</script>
+</body>
+</html>
