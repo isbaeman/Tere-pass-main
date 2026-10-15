@@ -19,15 +19,15 @@ body {
 #stage { width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:0 6vw; }
 
 #line {
-  --reveal: -30%;
+  --reveal: -40%;
   margin:0; width:100%; text-align:center; direction:rtl; unicode-bidi:plaintext;
   font-size:clamp(1.8rem,5.8vw,3.7rem); line-height:2.5; padding:.75em .5em;
   color:var(--ink); font-weight:500; word-spacing:.12em;
   opacity:0;
   will-change: opacity, filter, mask-image;
   text-shadow: 0 0 1px rgba(255,244,214,.7), 0 0 18px rgba(214,172,92,.38), 0 0 60px rgba(214,172,92,.16);
-  -webkit-mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 30%));
-  mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 30%));
+  -webkit-mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 40%));
+  mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 40%));
 }
 
 #menu { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; align-items:center; transition:opacity .8s ease; z-index:3; }
@@ -119,9 +119,9 @@ const startBtn = document.getElementById("start");
 const status = document.getElementById("status");
 
 // Slow & smooth tuning
-const REVEAL_MAX  = 6;    // longest handwriting wipe (seconds)
-const REVEAL_FRAC = 0.85; // wipe takes 85% of the line's duration
-const FADE_OUT    = 1.6;  // gentle fade at the end of a line (seconds)
+const REVEAL_MAX  = 14;   // longest handwriting wipe (seconds)
+const REVEAL_FRAC = 1.0;  // wipe takes the whole line duration (slow)
+const FADE_OUT    = 2.2;  // fade-out of the final line only (seconds)
 
 let playing = false;
 let cur = -2;
@@ -129,20 +129,22 @@ let animationStarted = false;
 
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 // Smooth, but starts moving right away so writing begins the moment the line starts
-const ease = t => 0.35 * t + 0.65 * (-(Math.cos(Math.PI * t) - 1) / 2);
+const ease = t => 0.6 * t + 0.4 * (-(Math.cos(Math.PI * t) - 1) / 2);
 
 function hide() {
   el.style.opacity = "0";
   el.style.filter = "none";
-  el.style.setProperty("--reveal", "-30%");
+  el.style.setProperty("--reveal", "-40%");
 }
 
 function frame() {
   const t = song.currentTime;
 
+  // Current line = latest line whose start time has passed.
+  // It stays on screen until the NEXT line starts.
   let i = -1;
   for (let k = 0; k < START.length; k++) {
-    if (START[k] <= t && t < END[k]) { i = k; break; }
+    if (START[k] <= t) i = k; else break;
   }
 
   if (i !== cur) {
@@ -160,11 +162,15 @@ function frame() {
     // Handwriting reveal starts exactly at the line's start time
     const revealDur = Math.min(REVEAL_MAX, dur * REVEAL_FRAC);
     const p = ease(clamp(local / revealDur));
-    el.style.setProperty("--reveal", (-30 + 130 * p).toFixed(2) + "%");
+    el.style.setProperty("--reveal", (-40 + 140 * p).toFixed(2) + "%");
 
-    // No fade-in: only fade out at the end
-    const fout = clamp((e - t) / Math.min(FADE_OUT, dur * 0.5));
-    const o = -(Math.cos(Math.PI * fout) - 1) / 2;
+    // Stay fully visible until the next line starts.
+    // Only the very last line fades out, after its end time.
+    let o = 1;
+    if (i === START.length - 1) {
+      const after = clamp((t - e) / FADE_OUT);
+      o = 1 - (-(Math.cos(Math.PI * after) - 1) / 2);
+    }
     el.style.opacity = o.toFixed(3);
     el.style.filter = o < 1 ? `blur(${((1 - o) * 4).toFixed(2)}px)` : "none";
   }
