@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
 <head>
@@ -8,64 +9,155 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;500&family=Gulzar&family=Scheherazade+New:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-:root { --bg:#0a0908; --ink:#f1e3c0; --gold:#c9a45c; }
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { width:100%; height:100%; margin:0; }
-body {
-  background: radial-gradient(ellipse at 50% 45%, #17130d 0%, #0a0908 55%, #050404 100%);
-  color: var(--ink); overflow:hidden; touch-action:manipulation; user-select:none; cursor:pointer;
-  font-family:'Noto Nastaliq Urdu','Gulzar','Scheherazade New',serif;
+:root {
+    --bg: #0a0908;
+    --ink: #f1e3c0;
+    --gold: #c9a45c;
 }
-#stage { width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:0 6vw; }
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    background: radial-gradient(ellipse at 50% 45%, #17130d 0%, #0a0908 55%, #050404 100%);
+    color: var(--ink);
+    overflow: hidden;
+    touch-action: manipulation;
+    user-select: none;
+    cursor: pointer;
+    font-family: 'Noto Nastaliq Urdu', 'Gulzar', 'Scheherazade New', serif;
+}
+
+#stage {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6vw;
+}
 
 #line {
-  --reveal: -40%;
-  margin:0; width:100%; text-align:center; direction:rtl; unicode-bidi:plaintext;
-  font-size:clamp(1.8rem,5.8vw,3.7rem); line-height:2.5; padding:.75em .5em;
-  color:var(--ink); font-weight:500; word-spacing:.12em;
-  opacity:0;
-  will-change: opacity, filter, mask-image;
-  text-shadow: 0 0 1px rgba(255,244,214,.7), 0 0 18px rgba(214,172,92,.38), 0 0 60px rgba(214,172,92,.16);
-  -webkit-mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 40%));
-  mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 40%));
+    --reveal: -40%;
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    direction: rtl;
+    unicode-bidi: plaintext;
+    font-size: clamp(1.8rem, 5.8vw, 3.7rem);
+    line-height: 2.5;
+    padding: .75em .5em;
+    color: var(--ink);
+    font-weight: 500;
+    word-spacing: .12em;
+    opacity: 0;
+    will-change: opacity, filter, mask-image;
+    text-shadow: 0 0 1px rgba(255,244,214,.7), 0 0 18px rgba(214,172,92,.38), 0 0 60px rgba(214,172,92,.16);
+    -webkit-mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 40%));
+    mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 40%));
 }
 
-#menu { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; align-items:center; transition:opacity .8s ease; z-index:3; }
-body.started #menu { opacity:0; pointer-events:none; }
-button {
-  background:rgba(10,9,8,.75); border:1px solid rgba(201,164,92,.6); color:var(--gold);
-  border-radius:999px; min-height:48px; padding:8px 28px; font:inherit; font-size:1.1rem; cursor:pointer; transition:background .4s ease;
+#menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    transition: opacity .8s ease;
+    z-index: 3;
 }
-button:hover { background:rgba(201,164,92,.12); }
-button:focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
+
+body.started #menu {
+    opacity: 0;
+    pointer-events: none;
+}
+
+button {
+    background: rgba(10,9,8,.75);
+    border: 1px solid rgba(201,164,92,.6);
+    color: var(--gold);
+    border-radius: 999px;
+    min-height: 48px;
+    padding: 8px 28px;
+    font: inherit;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background .4s ease;
+}
+
+button:hover {
+    background: rgba(201,164,92,.12);
+}
+
+button:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+}
 
 #status {
-  position:fixed; bottom:calc(env(safe-area-inset-bottom,0px) + 24px); left:0; right:0;
-  text-align:center; color:var(--gold); opacity:.65; font-size:.8rem; pointer-events:none;
+    position: fixed;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: var(--gold);
+    opacity: .65;
+    font-size: .8rem;
+    pointer-events: none;
 }
+
 body::after {
-  content:""; position:fixed;
-  inset:calc(env(safe-area-inset-top,0px) + 14px) 14px calc(env(safe-area-inset-bottom,0px) + 14px);
-  border:1px solid rgba(201,164,92,.24); outline:1px solid rgba(201,164,92,.09); outline-offset:6px; border-radius:2px; pointer-events:none;
+    content: "";
+    position: fixed;
+    inset: calc(env(safe-area-inset-top, 0px) + 14px) 14px calc(env(safe-area-inset-bottom, 0px) + 14px);
+    border: 1px solid rgba(201,164,92,.24);
+    outline: 1px solid rgba(201,164,92,.09);
+    outline-offset: 6px;
+    border-radius: 2px;
+    pointer-events: none;
 }
-@media (max-width:600px) { #line { font-size:clamp(1.6rem,7vw,2.5rem); line-height:2.3; } }
-@media (prefers-reduced-motion: reduce) { #line { filter:none !important; } }
+
+@media (max-width: 600px) {
+    #line {
+        font-size: clamp(1.6rem, 7vw, 2.5rem);
+        line-height: 2.3;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #line {
+        filter: none !important;
+    }
+}
 </style>
 </head>
 
 <body>
 
-<div id="stage"><p id="line" aria-live="polite"></p></div>
-<div id="menu"><button id="start" type="button">شروع کریں</button></div>
+<div id="stage">
+    <p id="line" aria-live="polite"></p>
+</div>
+
+<div id="menu">
+    <button id="start" type="button">شروع کریں</button>
+</div>
+
 <div id="status">شروع کرنے کے لیے بٹن دبائیں</div>
 
 <audio id="song" src="tere pass main.mp3" preload="auto"></audio>
 
 <script>
-// Shift every lyric together (seconds). Use 0 when timings match the audio.
 const OFFSET = 0;
 
-// Each row: [start, end, lyric] in seconds
 const lyrics = [
     [16, 21, "جیسے تُو ہے پاس میرے"],
     [21, 26, "تیرے پاس میں"],
@@ -108,108 +200,138 @@ const lyrics = [
     [226, 230, "جیسے شاموں کے سویرے"],
     [230, 234, "تیرے پاس میں"]
 ];
-const START = LYRICS.map(r => r[0] + OFFSET);
-const END   = LYRICS.map(r => r[1] + OFFSET);
-const TEXT  = LYRICS.map(r => r[2]);
+
+const START = lyrics.map(row => row[0] + OFFSET);
+const END = lyrics.map(row => row[1] + OFFSET);
+const TEXT = lyrics.map(row => row[2]);
 
 const el = document.getElementById("line");
 const song = document.getElementById("song");
 const startBtn = document.getElementById("start");
 const status = document.getElementById("status");
 
-// Slow & smooth tuning
-const REVEAL_MAX  = 14;   // longest handwriting wipe (seconds)
-const REVEAL_FRAC = 1.0;  // wipe takes the whole line duration (slow)
-const FADE_OUT    = 2.2;  // fade-out of the final line only (seconds)
+const REVEAL_MAX = 14;
+const REVEAL_FRAC = 1.0;
+const FADE_OUT = 2.2;
 
 let playing = false;
 let cur = -2;
 let animationStarted = false;
 
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
-// Smooth, but starts moving right away so writing begins the moment the line starts
-const ease = t => 0.6 * t + 0.4 * (-(Math.cos(Math.PI * t) - 1) / 2);
+
+const ease = t =>
+    0.6 * t + 0.4 * (-(Math.cos(Math.PI * t) - 1) / 2);
 
 function hide() {
-  el.style.opacity = "0";
-  el.style.filter = "none";
-  el.style.setProperty("--reveal", "-40%");
+    el.style.opacity = "0";
+    el.style.filter = "none";
+    el.style.setProperty("--reveal", "-40%");
 }
 
 function frame() {
-  const t = song.currentTime;
+    const t = song.currentTime;
 
-  // Current line = latest line whose start time has passed.
-  // It stays on screen until the NEXT line starts.
-  let i = -1;
-  for (let k = 0; k < START.length; k++) {
-    if (START[k] <= t) i = k; else break;
-  }
+    let i = -1;
 
-  if (i !== cur) {
-    cur = i;
-    // Reset BEFORE showing new text, so nothing appears until the wipe starts
-    hide();
-    el.textContent = i < 0 ? "" : TEXT[i];
-  }
-
-  if (i >= 0) {
-    const s = START[i], e = END[i];
-    const dur = e - s;
-    const local = t - s;
-
-    // Handwriting reveal starts exactly at the line's start time
-    const revealDur = Math.min(REVEAL_MAX, dur * REVEAL_FRAC);
-    const p = ease(clamp(local / revealDur));
-    el.style.setProperty("--reveal", (-40 + 140 * p).toFixed(2) + "%");
-
-    // Stay fully visible until the next line starts.
-    // Only the very last line fades out, after its end time.
-    let o = 1;
-    if (i === START.length - 1) {
-      const after = clamp((t - e) / FADE_OUT);
-      o = 1 - (-(Math.cos(Math.PI * after) - 1) / 2);
+    for (let k = 0; k < START.length; k++) {
+        if (START[k] <= t) {
+            i = k;
+        } else {
+            break;
+        }
     }
-    el.style.opacity = o.toFixed(3);
-    el.style.filter = o < 1 ? `blur(${((1 - o) * 4).toFixed(2)}px)` : "none";
-  }
 
-  if (animationStarted) requestAnimationFrame(frame);
+    if (i !== cur) {
+        cur = i;
+        hide();
+        el.textContent = i < 0 ? "" : TEXT[i];
+    }
+
+    if (i >= 0) {
+        const s = START[i];
+        const e = END[i];
+        const dur = e - s;
+        const local = t - s;
+
+        const revealDur = Math.min(REVEAL_MAX, dur * REVEAL_FRAC);
+        const p = ease(clamp(local / revealDur));
+
+        el.style.setProperty(
+            "--reveal",
+            (-40 + 140 * p).toFixed(2) + "%"
+        );
+
+        let opacity = 1;
+
+        if (i === START.length - 1) {
+            const after = clamp((t - e) / FADE_OUT);
+            opacity = 1 - (-(Math.cos(Math.PI * after) - 1) / 2);
+        }
+
+        el.style.opacity = opacity.toFixed(3);
+
+        el.style.filter = opacity < 1
+            ? `blur(${((1 - opacity) * 4).toFixed(2)}px)`
+            : "none";
+    }
+
+    if (animationStarted) {
+        requestAnimationFrame(frame);
+    }
 }
 
-startBtn.addEventListener("click", async (e) => {
-  e.stopPropagation();
-  if (playing) return;
+startBtn.addEventListener("click", async (event) => {
+    event.stopPropagation();
 
-  document.body.classList.add("started");
-  status.textContent = "نظم کے ساتھ۔۔۔";
+    if (playing) return;
 
-  try {
-    if (document.fonts && document.fonts.ready) await document.fonts.ready;
-    song.currentTime = 0;
-    await song.play();
-    playing = true;
-    if (!animationStarted) { animationStarted = true; requestAnimationFrame(frame); }
-  } catch (error) {
-    status.textContent = "آڈیو فائل چیک کریں: tere pass main.mp3";
-    document.body.classList.remove("started");
-  }
+    document.body.classList.add("started");
+    status.textContent = "نظم کے ساتھ۔۔۔";
+
+    try {
+        if (document.fonts && document.fonts.ready) {
+            await document.fonts.ready;
+        }
+
+        song.currentTime = 0;
+        await song.play();
+
+        playing = true;
+
+        if (!animationStarted) {
+            animationStarted = true;
+            requestAnimationFrame(frame);
+        }
+    } catch (error) {
+        status.textContent = "آڈیو فائل چیک کریں: tere pass main.mp3";
+        document.body.classList.remove("started");
+    }
 });
 
-// Tap the background to pause or resume.
-document.body.addEventListener("click", async (e) => {
-  if (e.target.closest("button")) return;
-  if (!playing) return;
-  if (song.paused) {
-    try { await song.play(); }
-    catch (error) { status.textContent = "دوبارہ پلے کرنے کے لیے ٹیپ کریں"; }
-  } else {
-    song.pause();
-  }
+document.body.addEventListener("click", async (event) => {
+    if (event.target.closest("button")) return;
+    if (!playing) return;
+
+    if (song.paused) {
+        try {
+            await song.play();
+        } catch (error) {
+            status.textContent = "دوبارہ پلے کرنے کے لیے ٹیپ کریں";
+        }
+    } else {
+        song.pause();
+    }
 });
 
-song.addEventListener("ended", () => { playing = false; status.textContent = "اختتام"; });
-song.addEventListener("error", () => { status.textContent = "آڈیو نہیں ملی — فائل کا نام چیک کریں"; });
+song.addEventListener("ended", () => {
+    playing = false;
+    status.textContent = "اختتام";
+});
+
+song.addEventListener("error", () => {
+    status.textContent = "آڈیو نہیں ملی — فائل کا نام چیک کریں";
+});
 </script>
 
 </body>
