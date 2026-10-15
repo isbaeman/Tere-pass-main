@@ -4,9 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>جیسے تُو ہے پاس میرے</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;500&family=Gulzar&family=Scheherazade+New:wght@400;500&display=swap" rel="stylesheet">
-
 <style>
 :root { --bg:#0a0908; --ink:#f1e3c0; --gold:#c9a45c; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -16,21 +14,22 @@ body {
   color: var(--ink); overflow:hidden; touch-action:manipulation; user-select:none; cursor:pointer;
   font-family:'Noto Nastaliq Urdu','Gulzar','Scheherazade New',serif;
 }
-#stage { width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:0 6vw; }
-
-#line {
-  --reveal: -40%;
-  margin:0; width:100%; text-align:center; direction:rtl; unicode-bidi:plaintext;
+/* two stacked layers: the old line fades while the new one is written */
+#stage { width:100%; height:100%; display:grid; place-items:center; padding:0 6vw; }
+.line {
+  --reveal: -20%;
+  grid-area:1/1; margin:0; width:100%; text-align:center; direction:rtl; unicode-bidi:plaintext;
   font-size:clamp(1.8rem,5.8vw,3.7rem); line-height:2.5; padding:.75em .5em;
   color:var(--ink); font-weight:500; word-spacing:.12em;
-  opacity:0;
-  will-change: opacity, filter, mask-image;
+  opacity:0; transition:opacity .7s ease;
   text-shadow: 0 0 1px rgba(255,244,214,.7), 0 0 18px rgba(214,172,92,.38), 0 0 60px rgba(214,172,92,.16);
-  -webkit-mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 40%));
-  mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 40%));
+  -webkit-mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 20%));
+  mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 20%));
 }
+.line.on  { opacity:1; transition:opacity .25s ease; }
+.line.off { opacity:0; transition:opacity .9s ease; }
 
-#menu { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; align-items:center; transition:opacity .8s ease; z-index:3; }
+#menu { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); transition:opacity .8s ease; z-index:3; }
 body.started #menu { opacity:0; pointer-events:none; }
 button {
   background:rgba(10,9,8,.75); border:1px solid rgba(201,164,92,.6); color:var(--gold);
@@ -38,7 +37,6 @@ button {
 }
 button:hover { background:rgba(201,164,92,.12); }
 button:focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
-
 #status {
   position:fixed; bottom:calc(env(safe-area-inset-bottom,0px) + 24px); left:0; right:0;
   text-align:center; color:var(--gold); opacity:.65; font-size:.8rem; pointer-events:none;
@@ -48,158 +46,166 @@ body::after {
   inset:calc(env(safe-area-inset-top,0px) + 14px) 14px calc(env(safe-area-inset-bottom,0px) + 14px);
   border:1px solid rgba(201,164,92,.24); outline:1px solid rgba(201,164,92,.09); outline-offset:6px; border-radius:2px; pointer-events:none;
 }
-@media (max-width:600px) { #line { font-size:clamp(1.6rem,7vw,2.5rem); line-height:2.3; } }
-@media (prefers-reduced-motion: reduce) { #line { filter:none !important; } }
+@media (max-width:600px) { .line { font-size:clamp(1.6rem,7vw,2.5rem); line-height:2.3; } }
+@media (prefers-reduced-motion: reduce) { .line, .line.on, .line.off { transition:none; } }
 </style>
 </head>
-
 <body>
 
-<div id="stage"><p id="line" aria-live="polite"></p></div>
+<div id="stage">
+  <p class="line" id="lineA" aria-live="polite"></p>
+  <p class="line" id="lineB" aria-hidden="true"></p>
+</div>
 <div id="menu"><button id="start" type="button">شروع کریں</button></div>
 <div id="status">شروع کرنے کے لیے بٹن دبائیں</div>
 
-<audio id="song" src="tere pass main.mp3" preload="auto"></audio>
+<audio id="song" preload="auto">
+  <source src="tere pass main.mp3" type="audio/mpeg">
+  <source src="tere_pass_main.mpeg" type="audio/mpeg">
+</audio>
 
 <script>
-// Shift every lyric together (seconds). Use 0 when timings match the audio.
+// Start times were measured from the audio itself (vocal onsets), in seconds.
+// OFFSET shifts everything: use a small + value if lyrics feel early, - if late.
 const OFFSET = 0;
+// Text starts being written this much before the voice, so the eye leads the ear.
+const LEAD = 0.15;
+const SONG_END = 237;   // last line finishes here
 
-// Each row: [start, end, lyric] in seconds
 const LYRICS = [
-    [16, 21, "جیسے تُو ہے پاس میرے"],
-    [21, 26, "تیرے پاس میں"],
-    [26, 30, "جیسے شاموں کے سویرے"],
-    [30, 34, "تیرے پاس میں"],
+  [16.5,  "جیسے تُو ہے پاس میرے"],
+  [21.65, "تیرے پاس میں"],
+  [26.7,  "جیسے شاموں کے سویرے"],
+  [31.8,  "تیرے پاس میں"],
 
-    [36, 40, "جیسے کاغذ پہ کوئی نظم لکھے"],
-    [40, 43, "یا بھولی سی کوئی قسم"],
+  [36.05, "جیسے کاغذ پہ کوئی نظم لکھے"],
+  [41.95, "یا بھولی سی کوئی قسم"],
 
-    [46, 50, "جیسے پانی پاس پیاسے"],
-    [50, 55, "تیرے پاس میں"],
-    [57, 61, "جیسے دل کے ہیں دلاسے"],
-    [61, 65, "تیرے پاس میں"],
+  [46.95, "جیسے پانی پاس پیاسے"],
+  [52.05, "تیرے پاس میں"],
+  [57.1,  "جیسے دل کے ہیں دلاسے"],
+  [62.25, "تیرے پاس میں"],
 
-    [77, 81, "جھوٹ ہے یہ دوریاں"],
-    [81, 85, "جھوٹ فاصلہ ہے"],
-    [85, 91, "تیرے ساتھ ہی رہوں گا میں"],
-    [91, 96, "بات میں، خیال میں"],
+  [77.3,  "جھوٹ ہے یہ دوریاں"],
+  [82.5,  "جھوٹ فاصلہ ہے"],
+  [86.65, "تیرے ساتھ ہی رہوں گا میں"],
+  [92.7,  "بات میں، خیال میں"],
 
-    [96, 102, "جیسے ہونٹوں میں ہو لالی"],
-    [102, 107, "تیرے پاس میں"],
-    [107, 111, "جیسے کانوں میں ہو بالی"],
-    [111, 116, "تیرے پاس میں"],
+  [97.65, "جیسے ہونٹوں میں ہو لالی"],
+  [102.8, "تیرے پاس میں"],
+  [107.8, "جیسے کانوں میں ہو بالی"],
+  [112.9, "تیرے پاس میں"],
 
-    [117, 121, "جیسے تُو ہے پاس میرے"],
-    [121, 125, "تیرے پاس میں"],
-    [128, 132, "جیسے شاموں کے سویرے"],
-    [132, 136, "تیرے پاس میں"],
+  [117.9, "جیسے تُو ہے پاس میرے"],
+  [123.05,"تیرے پاس میں"],
+  [128.1, "جیسے شاموں کے سویرے"],
+  [133.2, "تیرے پاس میں"],
 
-    [153, 157, "اپنی کہانی اُتنی رہے گی"],
-    [157, 160, "چاہے بڑھا لو"],
-    [160, 162, "چاہے گھٹا لو"],
-    [162, 165, "کاجل نہیں میں"],
-    [165, 168, "گالوں کا تل ہوں"],
-    [168, 172, "مٹتا نہیں میں، کتنا مٹا لو"],
-    [173, 177, "میرا تو ہٹنا مشکل بڑا ہے"],
-    [177, 181, "تم سامنے سے شیشہ ہٹا لو"],
+  [154.5, "اپنی کہانی اُتنی رہے گی"],
+  [158.5, "چاہے بڑھا لو"],
+  [161.1, "چاہے گھٹا لو"],
+  [163.6, "کاجل نہیں میں"],
+  [166.1, "گالوں کا تل ہوں"],
+  [168.7, "مٹتا نہیں میں، کتنا مٹا لو"],
+  [174.7, "میرا تو ہٹنا مشکل بڑا ہے"],
+  [179.3, "تم سامنے سے شیشہ ہٹا لو"],
 
-    [186, 190, "جیسے آنکھوں کے اشارے"],
-    [190, 194, "تیرے پاس میں"],
-    [196, 200, "جیسے ندیا کے کنارے"],
-    [200, 204, "تیرے پاس میں"],
+  [186.4, "جیسے آنکھوں کے اشارے"],
+  [191.5, "تیرے پاس میں"],
+  [196.5, "جیسے ندیا کے کنارے"],
+  [201.75,"تیرے پاس میں"],
 
-    [205, 209, "جیسے کاغذ پہ کوئی نظم لکھے"],
-    [209, 213, "یا بھولی سی کوئی قسم"],
+  [205.9, "جیسے کاغذ پہ کوئی نظم لکھے"],
+  [211.8, "یا بھولی سی کوئی قسم"],
 
-    [216, 220, "جیسے تُو ہے پاس میرے"],
-    [220, 224, "تیرے پاس میں"],
-    [226, 230, "جیسے شاموں کے سویرے"],
-    [230, 234, "تیرے پاس میں"]
+  [216.9, "جیسے تُو ہے پاس میرے"],
+  [221.9, "تیرے پاس میں"],
+  [226.95,"جیسے شاموں کے سویرے"],
+  [232.0, "تیرے پاس میں"]
 ];
-const START = LYRICS.map(r => r[0] + OFFSET);
-const END   = LYRICS.map(r => r[1] + OFFSET);
-const TEXT  = LYRICS.map(r => r[2]);
 
-const el = document.getElementById("line");
+const START = LYRICS.map(r => r[0] + OFFSET);
+const TEXT  = LYRICS.map(r => r[1]);
+// A line is written over roughly as long as it is sung: scaled by length,
+// never longer than the time until the next line.
+const WRITE = START.map((s, i) => {
+  const gap = (i < START.length - 1 ? START[i + 1] : SONG_END + OFFSET) - s;
+  const sung = 0.9 + 0.17 * TEXT[i].length;
+  return Math.max(1.2, Math.min(sung, gap * 0.88, 6.5));
+});
+
+const layers = [document.getElementById("lineA"), document.getElementById("lineB")];
 const song = document.getElementById("song");
 const startBtn = document.getElementById("start");
 const status = document.getElementById("status");
 
-// Slow & smooth tuning
-const REVEAL_MAX  = 14;   // longest handwriting wipe (seconds)
-const REVEAL_FRAC = 1.0;  // wipe takes the whole line duration (slow)
-const FADE_OUT    = 2.2;  // fade-out of the final line only (seconds)
-
-let playing = false;
-let cur = -2;
-let animationStarted = false;
+const FADE_OUT = 2.2;      // final line fade-out (seconds)
+const EDGE = 20;           // soft edge width of the writing wipe (%)
+let playing = false, running = false, cur = -2, front = 0;
 
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
-// Smooth, but starts moving right away so writing begins the moment the line starts
-const ease = t => 0.6 * t + 0.4 * (-(Math.cos(Math.PI * t) - 1) / 2);
+// gentle start, steady middle, soft landing
+const ease = t => t * t * (3 - 2 * t) * 0.55 + t * 0.45;
 
-function hide() {
-  el.style.opacity = "0";
-  el.style.filter = "none";
-  el.style.setProperty("--reveal", "-40%");
+// --- Smooth clock -----------------------------------------------------------
+// audio.currentTime updates in coarse steps on many browsers, which makes the
+// wipe stutter. Between updates we extrapolate with performance.now(), then
+// snap back to the real audio time whenever it advances.
+let lastCT = 0, lastPerf = 0, clock = 0;
+function now() {
+  const ct = song.currentTime, p = performance.now();
+  if (ct !== lastCT) { lastCT = ct; lastPerf = p; }
+  if (song.paused || song.ended) { clock = ct; return clock; }
+  const ahead = Math.min((p - lastPerf) / 1000, 0.25) * song.playbackRate;
+  const est = ct + ahead;
+  clock = Math.abs(est - clock) > 0.3 ? est : Math.max(clock, est); // never jitter backwards
+  return clock;
+}
+
+function show(i) {
+  const old = layers[front];
+  front ^= 1;
+  const el = layers[front];
+  old.classList.remove("on"); old.classList.add("off");
+  el.classList.remove("off");
+  el.style.setProperty("--reveal", (-EDGE) + "%");
+  el.textContent = i < 0 ? "" : TEXT[i];
+  el.setAttribute("aria-hidden", "false"); old.setAttribute("aria-hidden", "true");
+  if (i >= 0) { void el.offsetWidth; el.classList.add("on"); }
 }
 
 function frame() {
-  const t = song.currentTime;
+  const t = now() + LEAD;
 
-  // Current line = latest line whose start time has passed.
-  // It stays on screen until the NEXT line starts.
   let i = -1;
-  for (let k = 0; k < START.length; k++) {
-    if (START[k] <= t) i = k; else break;
-  }
-
-  if (i !== cur) {
-    cur = i;
-    // Reset BEFORE showing new text, so nothing appears until the wipe starts
-    hide();
-    el.textContent = i < 0 ? "" : TEXT[i];
-  }
+  for (let k = 0; k < START.length; k++) { if (START[k] <= t) i = k; else break; }
+  if (i !== cur) { cur = i; show(i); }
 
   if (i >= 0) {
-    const s = START[i], e = END[i];
-    const dur = e - s;
-    const local = t - s;
+    const el = layers[front];
+    const p = ease(clamp((t - START[i]) / WRITE[i]));
+    el.style.setProperty("--reveal", (-EDGE + (100 + EDGE) * p).toFixed(2) + "%");
 
-    // Handwriting reveal starts exactly at the line's start time
-    const revealDur = Math.min(REVEAL_MAX, dur * REVEAL_FRAC);
-    const p = ease(clamp(local / revealDur));
-    el.style.setProperty("--reveal", (-40 + 140 * p).toFixed(2) + "%");
-
-    // Stay fully visible until the next line starts.
-    // Only the very last line fades out, after its end time.
-    let o = 1;
     if (i === START.length - 1) {
-      const after = clamp((t - e) / FADE_OUT);
-      o = 1 - (-(Math.cos(Math.PI * after) - 1) / 2);
-    }
-    el.style.opacity = o.toFixed(3);
-    el.style.filter = o < 1 ? `blur(${((1 - o) * 4).toFixed(2)}px)` : "none";
+      const after = clamp((t - (SONG_END + OFFSET)) / FADE_OUT);
+      el.style.opacity = (1 - after * after * (3 - 2 * after)).toFixed(3);
+    } else if (el.style.opacity) el.style.opacity = "";
   }
-
-  if (animationStarted) requestAnimationFrame(frame);
+  if (running) requestAnimationFrame(frame);
 }
 
 startBtn.addEventListener("click", async (e) => {
   e.stopPropagation();
   if (playing) return;
-
   document.body.classList.add("started");
   status.textContent = "نظم کے ساتھ۔۔۔";
-
   try {
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
-    song.currentTime = 0;
+    song.currentTime = 0; cur = -2;
     await song.play();
     playing = true;
-    if (!animationStarted) { animationStarted = true; requestAnimationFrame(frame); }
-  } catch (error) {
+    if (!running) { running = true; requestAnimationFrame(frame); }
+  } catch (err) {
     status.textContent = "آڈیو فائل چیک کریں: tere pass main.mp3";
     document.body.classList.remove("started");
   }
@@ -207,19 +213,15 @@ startBtn.addEventListener("click", async (e) => {
 
 // Tap the background to pause or resume.
 document.body.addEventListener("click", async (e) => {
-  if (e.target.closest("button")) return;
-  if (!playing) return;
+  if (e.target.closest("button") || !playing) return;
   if (song.paused) {
-    try { await song.play(); }
-    catch (error) { status.textContent = "دوبارہ پلے کرنے کے لیے ٹیپ کریں"; }
-  } else {
-    song.pause();
-  }
+    try { await song.play(); } catch (err) { status.textContent = "دوبارہ پلے کرنے کے لیے ٹیپ کریں"; }
+  } else song.pause();
 });
 
+song.addEventListener("seeked", () => { clock = song.currentTime; cur = -2; });
 song.addEventListener("ended", () => { playing = false; status.textContent = "اختتام"; });
 song.addEventListener("error", () => { status.textContent = "آڈیو نہیں ملی — فائل کا نام چیک کریں"; });
 </script>
-
 </body>
 </html>
