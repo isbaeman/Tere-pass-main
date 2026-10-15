@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
 <head>
@@ -13,30 +12,20 @@
   --bg: #0a0908;
   --ink: #f1e3c0;
   --gold: #c9a45c;
-  --dim: rgba(201,164,92,.55);
 }
 
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-html, body {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-}
+html, body { width: 100%; height: 100%; margin: 0; }
 
 body {
-  background: radial-gradient(ellipse at 50% 45%,
-    #17130d 0%, #0a0908 55%, #050404 100%);
+  background: radial-gradient(ellipse at 50% 45%, #17130d 0%, #0a0908 55%, #050404 100%);
   color: var(--ink);
   overflow: hidden;
   touch-action: manipulation;
   user-select: none;
   cursor: pointer;
-  font-family: 'Noto Nastaliq Urdu', 'Gulzar',
-    'Scheherazade New', serif;
+  font-family: 'Noto Nastaliq Urdu', 'Gulzar', 'Scheherazade New', serif;
 }
 
 #stage {
@@ -46,11 +35,10 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0 6vw;
-  position: relative;
 }
 
 #line {
-  --reveal: 0%;
+  --reveal: -30%;
   margin: 0;
   width: 100%;
   text-align: center;
@@ -62,34 +50,15 @@ body {
   color: var(--ink);
   font-weight: 500;
   word-spacing: .12em;
+  opacity: 0;
+  will-change: opacity, filter, transform, mask-image;
   text-shadow:
     0 0 1px rgba(255,244,214,.7),
     0 0 18px rgba(214,172,92,.38),
     0 0 60px rgba(214,172,92,.16);
 
-  -webkit-mask-image: linear-gradient(
-    to left,
-    #000 0%,
-    #000 var(--reveal),
-    transparent calc(var(--reveal) + 18%)
-  );
-  mask-image: linear-gradient(
-    to left,
-    #000 0%,
-    #000 var(--reveal),
-    transparent calc(var(--reveal) + 18%)
-  );
-
-  transition:
-    opacity .9s ease,
-    filter .9s ease,
-    transform .9s ease;
-}
-
-#line.out {
-  opacity: 0;
-  filter: blur(5px);
-  transform: translateY(-6px);
+  -webkit-mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 30%));
+  mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 30%));
 }
 
 #menu {
@@ -99,14 +68,11 @@ body {
   transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
-  transition: opacity .6s ease;
+  transition: opacity .8s ease;
   z-index: 3;
 }
 
-body.started #menu {
-  opacity: 0;
-  pointer-events: none;
-}
+body.started #menu { opacity: 0; pointer-events: none; }
 
 button {
   background: rgba(10,9,8,.75);
@@ -118,16 +84,11 @@ button {
   font: inherit;
   font-size: 1.1rem;
   cursor: pointer;
+  transition: background .4s ease;
 }
 
-button:hover {
-  background: rgba(201,164,92,.12);
-}
-
-button:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 3px;
-}
+button:hover { background: rgba(201,164,92,.12); }
+button:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 
 #status {
   position: fixed;
@@ -144,9 +105,7 @@ button:focus-visible {
 body::after {
   content: "";
   position: fixed;
-  inset: calc(env(safe-area-inset-top, 0px) + 14px)
-         14px
-         calc(env(safe-area-inset-bottom, 0px) + 14px);
+  inset: calc(env(safe-area-inset-top, 0px) + 14px) 14px calc(env(safe-area-inset-bottom, 0px) + 14px);
   border: 1px solid rgba(201,164,92,.24);
   outline: 1px solid rgba(201,164,92,.09);
   outline-offset: 6px;
@@ -155,10 +114,11 @@ body::after {
 }
 
 @media (max-width: 600px) {
-  #line {
-    font-size: clamp(1.6rem, 7vw, 2.5rem);
-    line-height: 2.3;
-  }
+  #line { font-size: clamp(1.6rem, 7vw, 2.5rem); line-height: 2.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #line { filter: none !important; transform: none !important; }
 }
 </style>
 </head>
@@ -178,144 +138,135 @@ body::after {
 <audio id="song" src="tere pass main.mp3" preload="auto"></audio>
 
 <script>
-// Change this to adjust all lyric timings together.
-// Use 0 when timings already match the audio file.
+// Shift every lyric together (seconds). Use 0 when timings match the audio.
 const OFFSET = 0;
 
-// Each row: [start time in seconds, Urdu lyric]
+// Each row: [start, end, lyric] in seconds (from the transcript timings)
 const LYRICS = [
-  [16, "جیسے تُو ہے پاس میرے"],
-  [21, "تیرے پاس میں"],
-  [26, "جیسے شاموں کے سویرے"],
-  [30, "تیرے پاس میں"],
+  [16,  21,  "جیسے تُو ہے پاس میرے"],
+  [21,  26,  "تیرے پاس میں"],
+  [26,  30,  "جیسے شاموں کے سویرے"],
+  [30,  34,  "تیرے پاس میں"],
 
-  [36, "جیسے کاغذ پہ کوئی نظم لکھے"],
-  [39, "یا بھولی سی کوئی قسم"],
+  [36,  39,  "جیسے کاغذ پہ کوئی نظم لکھے"],
+  [39,  42,  "یا بھولی سی کوئی قسم"],
 
-  [46, "جیسے پانی پاس پیاسے"],
-  [48, "تیرے پاس میں"],
-  [57, "جیسے دل کے ہیں دلاسے"],
-  [61, "تیرے پاس میں"],
+  [46,  48,  "جیسے پانی پاس پیاسے"],
+  [48,  50,  "تیرے پاس میں"],
+  [57,  61,  "جیسے دل کے ہیں دلاسے"],
+  [61,  64,  "تیرے پاس میں"],
 
-  [77, "جھوٹ ہے یہ دوریاں"],
-  [80, "جھوٹ فاصلہ ہے"],
-  [85, "تیرے ساتھ ہی رہوں گا میں"],
-  [91, "بات میں، خیال میں"],
+  [77,  80,  "جھوٹ ہے یہ دوریاں"],
+  [80,  82,  "جھوٹ فاصلہ ہے"],
+  [85,  91,  "تیرے ساتھ ہی رہوں گا میں"],
+  [91,  96,  "بات میں، خیال میں"],
 
-  [96, "جیسے ہونٹوں میں ہو لالی"],
-  [102, "تیرے پاس میں"],
-  [107, "جیسے کانوں میں ہو بالی"],
-  [111, "تیرے پاس میں"],
+  [96,  102, "جیسے ہونٹوں میں ہو لالی"],
+  [102, 107, "تیرے پاس میں"],
+  [107, 111, "جیسے کانوں میں ہو بالی"],
+  [111, 115, "تیرے پاس میں"],
 
-  [117, "جیسے تُو ہے پاس میرے"],
-  [120, "تیرے پاس میں"],
-  [128, "جیسے شاموں کے سویرے"],
-  [131, "تیرے پاس میں"],
+  [117, 120, "جیسے تُو ہے پاس میرے"],
+  [120, 123, "تیرے پاس میں"],
+  [128, 131, "جیسے شاموں کے سویرے"],
+  [131, 135, "تیرے پاس میں"],
 
-  [153, "اپنی کہانی اُتنی رہے گی"],
-  [157, "چاہے بڑھا لو"],
-  [160, "چاہے گھٹا لو"],
+  [153, 157, "اپنی کہانی اُتنی رہے گی"],
+  [157, 160, "چاہے بڑھا لو"],
+  [160, 162, "چاہے گھٹا لو"],
 
-  [162, "کاجل نہیں میں"],
-  [165, "گالوں کا تل ہوں"],
-  [168, "مٹتا نہیں میں، کتنا مٹا لو"],
+  [162, 165, "کاجل نہیں میں"],
+  [165, 168, "گالوں کا تل ہوں"],
+  [168, 172, "مٹتا نہیں میں، کتنا مٹا لو"],
 
-  [173, "میرا تو ہٹنا مشکل بڑا ہے"],
-  [177, "تم سامنے سے شیشہ ہٹا لو"],
+  [173, 177, "میرا تو ہٹنا مشکل بڑا ہے"],
+  [177, 180, "تم سامنے سے شیشہ ہٹا لو"],
 
-  [186, "جیسے آنکھوں کے اشارے"],
-  [190, "تیرے پاس میں"],
-  [196, "جیسے ندیا کے کنارے"],
-  [199, "تیرے پاس میں"],
+  [186, 190, "جیسے آنکھوں کے اشارے"],
+  [190, 194, "تیرے پاس میں"],
+  [196, 199, "جیسے ندیا کے کنارے"],
+  [199, 201, "تیرے پاس میں"],
 
-  [205, "جیسے کاغذ پہ کوئی نظم لکھے"],
-  [209, "یا بھولی سی کوئی قسم"],
+  [205, 209, "جیسے کاغذ پہ کوئی نظم لکھے"],
+  [209, 213, "یا بھولی سی کوئی قسم"],
 
-  [216, "جیسے تُو ہے پاس میرے"],
-  [220, "تیرے پاس میں"],
-  [226, "جیسے شاموں کے سویرے"],
-  [230, "تیرے پاس میں"]
+  [216, 220, "جیسے تُو ہے پاس میرے"],
+  [220, 223, "تیرے پاس میں"],
+  [226, 230, "جیسے شاموں کے سویرے"],
+  [230, 233, "تیرے پاس میں"]
 ];
 
-const START = LYRICS.map(row => row[0] + OFFSET);
-const TEXT = LYRICS.map(row => row[1]);
+const START = LYRICS.map(r => r[0] + OFFSET);
+const END   = LYRICS.map(r => r[1] + OFFSET);
+const TEXT  = LYRICS.map(r => r[2]);
 
 const el = document.getElementById("line");
 const song = document.getElementById("song");
 const startBtn = document.getElementById("start");
 const status = document.getElementById("status");
 
-const REVEAL = 3.6;
-const FADE = 0.9;
-const LAST_LEN = 6;
+// Slow & smooth tuning
+const REVEAL_MAX = 6;     // longest wipe-in (seconds)
+const REVEAL_FRAC = 0.85; // wipe takes 85% of the line's duration
+const FADE_IN = 1.4;      // opacity fade-in (seconds)
+const FADE_OUT = 1.8;     // opacity fade-out (seconds)
 
 let playing = false;
 let cur = -2;
 let animationStarted = false;
 
-function ease(t) {
-  return t < 0.5
-    ? 2 * t * t
-    : 1 - Math.pow(-2 * t + 2, 2) / 2;
-}
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+// Smooth sine ease-in-out
+const ease = t => -(Math.cos(Math.PI * t) - 1) / 2;
 
 function frame() {
   const t = song.currentTime;
 
   let i = -1;
-
   for (let k = 0; k < START.length; k++) {
-    if (START[k] <= t) {
-      i = k;
-    } else {
-      break;
-    }
+    if (START[k] <= t && t < END[k]) { i = k; break; }
   }
 
   if (i !== cur) {
     cur = i;
-    el.classList.remove("out");
     el.textContent = i < 0 ? "" : TEXT[i];
-    el.style.setProperty("--reveal", "0%");
   }
 
   if (i >= 0) {
-    const s = START[i];
-    const isLast = i === START.length - 1;
-    const next = isLast ? s + LAST_LEN : START[i + 1];
-
-    const duration = Math.max(0.5, next - s);
+    const s = START[i], e = END[i];
+    const dur = e - s;
     const local = t - s;
-    const revealDuration = Math.min(REVEAL, duration * 0.6);
 
-    const progress = Math.min(1, Math.max(0, local / revealDuration));
-    const reveal = ease(progress) * 100;
+    const revealDur = Math.min(REVEAL_MAX, dur * REVEAL_FRAC);
+    const p = ease(clamp(local / revealDur));
+    el.style.setProperty("--reveal", (-30 + 130 * p).toFixed(2) + "%");
 
-    el.style.setProperty("--reveal", reveal.toFixed(2) + "%");
-    el.classList.toggle("out", local > duration - FADE);
+    const fin = ease(clamp(local / Math.min(FADE_IN, dur * 0.5)));
+    const fout = ease(clamp((e - t) / Math.min(FADE_OUT, dur * 0.5)));
+    const o = Math.min(fin, fout);
+
+    el.style.opacity = o.toFixed(3);
+    el.style.filter = `blur(${((1 - o) * 5).toFixed(2)}px)`;
+    el.style.transform = `translateY(${((1 - fin) * 8 - (1 - fout) * 6).toFixed(2)}px)`;
+  } else {
+    el.style.opacity = "0";
   }
 
-  if (animationStarted) {
-    requestAnimationFrame(frame);
-  }
+  if (animationStarted) requestAnimationFrame(frame);
 }
 
 startBtn.addEventListener("click", async (e) => {
   e.stopPropagation();
-
   if (playing) return;
 
   document.body.classList.add("started");
   status.textContent = "نظم کے ساتھ۔۔۔";
 
   try {
-    if (document.fonts && document.fonts.ready) {
-      await document.fonts.ready;
-    }
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
 
     song.currentTime = 0;
     await song.play();
-
     playing = true;
 
     if (!animationStarted) {
@@ -328,17 +279,14 @@ startBtn.addEventListener("click", async (e) => {
   }
 });
 
-// Tap the background to pause or resume the song.
+// Tap the background to pause or resume.
 document.body.addEventListener("click", async (e) => {
   if (e.target.closest("button")) return;
   if (!playing) return;
 
   if (song.paused) {
-    try {
-      await song.play();
-    } catch (error) {
-      status.textContent = "دوبارہ پلے کرنے کے لیے ٹیپ کریں";
-    }
+    try { await song.play(); }
+    catch (error) { status.textContent = "دوبارہ پلے کرنے کے لیے ٹیپ کریں"; }
   } else {
     song.pause();
   }
