@@ -8,131 +8,55 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;500&family=Gulzar&family=Scheherazade+New:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --bg: #0a0908;
-  --ink: #f1e3c0;
-  --gold: #c9a45c;
-}
-
+:root { --bg:#0a0908; --ink:#f1e3c0; --gold:#c9a45c; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-html, body { width: 100%; height: 100%; margin: 0; }
-
+html, body { width:100%; height:100%; margin:0; }
 body {
   background: radial-gradient(ellipse at 50% 45%, #17130d 0%, #0a0908 55%, #050404 100%);
-  color: var(--ink);
-  overflow: hidden;
-  touch-action: manipulation;
-  user-select: none;
-  cursor: pointer;
-  font-family: 'Noto Nastaliq Urdu', 'Gulzar', 'Scheherazade New', serif;
+  color: var(--ink); overflow:hidden; touch-action:manipulation; user-select:none; cursor:pointer;
+  font-family:'Noto Nastaliq Urdu','Gulzar','Scheherazade New',serif;
 }
-
-#stage {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 6vw;
-}
+#stage { width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:0 6vw; }
 
 #line {
   --reveal: -30%;
-  margin: 0;
-  width: 100%;
-  text-align: center;
-  direction: rtl;
-  unicode-bidi: plaintext;
-  font-size: clamp(1.8rem, 5.8vw, 3.7rem);
-  line-height: 2.5;
-  padding: .75em .5em;
-  color: var(--ink);
-  font-weight: 500;
-  word-spacing: .12em;
-  opacity: 0;
-  will-change: opacity, filter, transform, mask-image;
-  text-shadow:
-    0 0 1px rgba(255,244,214,.7),
-    0 0 18px rgba(214,172,92,.38),
-    0 0 60px rgba(214,172,92,.16);
-
+  margin:0; width:100%; text-align:center; direction:rtl; unicode-bidi:plaintext;
+  font-size:clamp(1.8rem,5.8vw,3.7rem); line-height:2.5; padding:.75em .5em;
+  color:var(--ink); font-weight:500; word-spacing:.12em;
+  opacity:0;
+  will-change: opacity, filter, mask-image;
+  text-shadow: 0 0 1px rgba(255,244,214,.7), 0 0 18px rgba(214,172,92,.38), 0 0 60px rgba(214,172,92,.16);
   -webkit-mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 30%));
   mask-image: linear-gradient(to left, #000 0%, #000 var(--reveal), transparent calc(var(--reveal) + 30%));
 }
 
-#menu {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  transition: opacity .8s ease;
-  z-index: 3;
-}
-
-body.started #menu { opacity: 0; pointer-events: none; }
-
+#menu { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; align-items:center; transition:opacity .8s ease; z-index:3; }
+body.started #menu { opacity:0; pointer-events:none; }
 button {
-  background: rgba(10,9,8,.75);
-  border: 1px solid rgba(201,164,92,.6);
-  color: var(--gold);
-  border-radius: 999px;
-  min-height: 48px;
-  padding: 8px 28px;
-  font: inherit;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: background .4s ease;
+  background:rgba(10,9,8,.75); border:1px solid rgba(201,164,92,.6); color:var(--gold);
+  border-radius:999px; min-height:48px; padding:8px 28px; font:inherit; font-size:1.1rem; cursor:pointer; transition:background .4s ease;
 }
-
-button:hover { background: rgba(201,164,92,.12); }
-button:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+button:hover { background:rgba(201,164,92,.12); }
+button:focus-visible { outline:2px solid var(--gold); outline-offset:3px; }
 
 #status {
-  position: fixed;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
-  left: 0;
-  right: 0;
-  text-align: center;
-  color: var(--gold);
-  opacity: .65;
-  font-size: .8rem;
-  pointer-events: none;
+  position:fixed; bottom:calc(env(safe-area-inset-bottom,0px) + 24px); left:0; right:0;
+  text-align:center; color:var(--gold); opacity:.65; font-size:.8rem; pointer-events:none;
 }
-
 body::after {
-  content: "";
-  position: fixed;
-  inset: calc(env(safe-area-inset-top, 0px) + 14px) 14px calc(env(safe-area-inset-bottom, 0px) + 14px);
-  border: 1px solid rgba(201,164,92,.24);
-  outline: 1px solid rgba(201,164,92,.09);
-  outline-offset: 6px;
-  border-radius: 2px;
-  pointer-events: none;
+  content:""; position:fixed;
+  inset:calc(env(safe-area-inset-top,0px) + 14px) 14px calc(env(safe-area-inset-bottom,0px) + 14px);
+  border:1px solid rgba(201,164,92,.24); outline:1px solid rgba(201,164,92,.09); outline-offset:6px; border-radius:2px; pointer-events:none;
 }
-
-@media (max-width: 600px) {
-  #line { font-size: clamp(1.6rem, 7vw, 2.5rem); line-height: 2.3; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #line { filter: none !important; transform: none !important; }
-}
+@media (max-width:600px) { #line { font-size:clamp(1.6rem,7vw,2.5rem); line-height:2.3; } }
+@media (prefers-reduced-motion: reduce) { #line { filter:none !important; } }
 </style>
 </head>
 
 <body>
 
-<div id="stage">
-  <p id="line" aria-live="polite"></p>
-</div>
-
-<div id="menu">
-  <button id="start" type="button">شروع کریں</button>
-</div>
-
+<div id="stage"><p id="line" aria-live="polite"></p></div>
+<div id="menu"><button id="start" type="button">شروع کریں</button></div>
 <div id="status">شروع کرنے کے لیے بٹن دبائیں</div>
 
 <audio id="song" src="tere pass main.mp3" preload="auto"></audio>
@@ -141,7 +65,7 @@ body::after {
 // Shift every lyric together (seconds). Use 0 when timings match the audio.
 const OFFSET = 0;
 
-// Each row: [start, end, lyric] in seconds (from the transcript timings)
+// Each row: [start, end, lyric] in seconds
 const LYRICS = [
 [16, 21, "جیسے تُو ہے پاس میرے"],
 [21, 26, "تیرے پاس میں"],
@@ -195,18 +119,23 @@ const startBtn = document.getElementById("start");
 const status = document.getElementById("status");
 
 // Slow & smooth tuning
-const REVEAL_MAX = 6;     // longest wipe-in (seconds)
+const REVEAL_MAX  = 6;    // longest handwriting wipe (seconds)
 const REVEAL_FRAC = 0.85; // wipe takes 85% of the line's duration
-const FADE_IN = 1.4;      // opacity fade-in (seconds)
-const FADE_OUT = 1.8;     // opacity fade-out (seconds)
+const FADE_OUT    = 1.6;  // gentle fade at the end of a line (seconds)
 
 let playing = false;
 let cur = -2;
 let animationStarted = false;
 
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
-// Smooth sine ease-in-out
-const ease = t => -(Math.cos(Math.PI * t) - 1) / 2;
+// Smooth, but starts moving right away so writing begins the moment the line starts
+const ease = t => 0.35 * t + 0.65 * (-(Math.cos(Math.PI * t) - 1) / 2);
+
+function hide() {
+  el.style.opacity = "0";
+  el.style.filter = "none";
+  el.style.setProperty("--reveal", "-30%");
+}
 
 function frame() {
   const t = song.currentTime;
@@ -218,6 +147,8 @@ function frame() {
 
   if (i !== cur) {
     cur = i;
+    // Reset BEFORE showing new text, so nothing appears until the wipe starts
+    hide();
     el.textContent = i < 0 ? "" : TEXT[i];
   }
 
@@ -226,19 +157,16 @@ function frame() {
     const dur = e - s;
     const local = t - s;
 
+    // Handwriting reveal starts exactly at the line's start time
     const revealDur = Math.min(REVEAL_MAX, dur * REVEAL_FRAC);
     const p = ease(clamp(local / revealDur));
     el.style.setProperty("--reveal", (-30 + 130 * p).toFixed(2) + "%");
 
-    const fin = ease(clamp(local / Math.min(FADE_IN, dur * 0.5)));
-    const fout = ease(clamp((e - t) / Math.min(FADE_OUT, dur * 0.5)));
-    const o = Math.min(fin, fout);
-
+    // No fade-in: only fade out at the end
+    const fout = clamp((e - t) / Math.min(FADE_OUT, dur * 0.5));
+    const o = -(Math.cos(Math.PI * fout) - 1) / 2;
     el.style.opacity = o.toFixed(3);
-    el.style.filter = `blur(${((1 - o) * 5).toFixed(2)}px)`;
-    el.style.transform = `translateY(${((1 - fin) * 8 - (1 - fout) * 6).toFixed(2)}px)`;
-  } else {
-    el.style.opacity = "0";
+    el.style.filter = o < 1 ? `blur(${((1 - o) * 4).toFixed(2)}px)` : "none";
   }
 
   if (animationStarted) requestAnimationFrame(frame);
@@ -253,15 +181,10 @@ startBtn.addEventListener("click", async (e) => {
 
   try {
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
-
     song.currentTime = 0;
     await song.play();
     playing = true;
-
-    if (!animationStarted) {
-      animationStarted = true;
-      requestAnimationFrame(frame);
-    }
+    if (!animationStarted) { animationStarted = true; requestAnimationFrame(frame); }
   } catch (error) {
     status.textContent = "آڈیو فائل چیک کریں: tere pass main.mp3";
     document.body.classList.remove("started");
@@ -272,7 +195,6 @@ startBtn.addEventListener("click", async (e) => {
 document.body.addEventListener("click", async (e) => {
   if (e.target.closest("button")) return;
   if (!playing) return;
-
   if (song.paused) {
     try { await song.play(); }
     catch (error) { status.textContent = "دوبارہ پلے کرنے کے لیے ٹیپ کریں"; }
@@ -281,14 +203,8 @@ document.body.addEventListener("click", async (e) => {
   }
 });
 
-song.addEventListener("ended", () => {
-  playing = false;
-  status.textContent = "اختتام";
-});
-
-song.addEventListener("error", () => {
-  status.textContent = "آڈیو نہیں ملی — فائل کا نام چیک کریں";
-});
+song.addEventListener("ended", () => { playing = false; status.textContent = "اختتام"; });
+song.addEventListener("error", () => { status.textContent = "آڈیو نہیں ملی — فائل کا نام چیک کریں"; });
 </script>
 
 </body>
