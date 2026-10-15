@@ -1,147 +1,358 @@
+
 <!DOCTYPE html>
 <html lang="ur" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>جیسے تُو ہے پاس میرے</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;500&family=Gulzar&family=Scheherazade+New:wght@400;500&display=swap">
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;500&family=Gulzar&family=Scheherazade+New:wght@400;500&display=swap" rel="stylesheet">
+
 <style>
-:root{
-  --bg:#0a0908; --ink:#f1e3c0; --gold:#c9a45c; --dim:rgba(201,164,92,.55);
-  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+:root {
+  --bg: #0a0908;
+  --ink: #f1e3c0;
+  --gold: #c9a45c;
+  --dim: rgba(201,164,92,.55);
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0}
-body{
-  background:radial-gradient(ellipse at 50% 45%, #17130d 0%, #0a0908 55%, #050404 100%);
-  color:var(--ink); overflow:hidden; touch-action:none;
-  -webkit-user-select:none; user-select:none; cursor:pointer;
-  font-family:'Noto Nastaliq Urdu','Gulzar','Gulzar Nastaliq','Scheherazade New',serif;
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
-#stage{height:100%; display:flex; align-items:center; justify-content:center; padding:0 6vw; position:relative}
-#line{
-  --p:0; margin:0; text-align:center; direction:rtl; unicode-bidi:plaintext;
-  font-size:clamp(1.8rem,5.8vw,3.7rem); line-height:2.5; padding:.75em .5em;
-  color:var(--ink); max-width:100%; font-weight:500; word-spacing:.12em; font-style:oblique 12deg; font-synthesis:style;
-  text-shadow:0 0 1px rgba(255,244,214,.7), 0 0 18px rgba(214,172,92,.38), 0 0 60px rgba(214,172,92,.16);
-  -webkit-mask-image:linear-gradient(to left,#000 calc(var(--p)*1% - 18%),transparent calc(var(--p)*1%));
-          mask-image:linear-gradient(to left,#000 calc(var(--p)*1% - 18%),transparent calc(var(--p)*1%));
-  transition:opacity .9s ease, filter .9s ease, transform .9s ease;
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
 }
-#line.out{opacity:0; filter:blur(5px); transform:translateY(-6px)}
-#line.hint{--p:130; opacity:.45}
-#menu{position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; flex-direction:column; gap:14px; align-items:center; transition:opacity .6s}
-body.started #menu{opacity:0; pointer-events:none}
-button{
-  background:none; border:1px solid rgba(201,164,92,.4); color:var(--gold); border-radius:999px;
-  min-width:44px; height:44px; padding:0 28px; font:inherit; font-size:1.1rem; cursor:pointer;
+
+body {
+  background: radial-gradient(ellipse at 50% 45%,
+    #17130d 0%, #0a0908 55%, #050404 100%);
+  color: var(--ink);
+  overflow: hidden;
+  touch-action: manipulation;
+  user-select: none;
+  cursor: pointer;
+  font-family: 'Noto Nastaliq Urdu', 'Gulzar',
+    'Scheherazade New', serif;
 }
-button:hover{background:rgba(201,164,92,.12)}
-button:focus-visible{outline:2px solid var(--gold); outline-offset:3px}
-#sync{font-size:.85rem; height:36px; opacity:.6}
-#out{position:fixed; inset:auto 16px calc(env(safe-area-inset-bottom,0px) + 16px) 16px; display:none; flex-direction:column; gap:8px; z-index:5; cursor:auto; -webkit-user-select:text; user-select:text}
-#out textarea{height:34vh; background:#0f0d0a; color:var(--ink); border:1px solid var(--dim); border-radius:8px; padding:10px; font:12px/1.4 monospace; direction:ltr}
-body::after{content:""; position:fixed; inset:calc(env(safe-area-inset-top,0px) + 14px) 14px calc(env(safe-area-inset-bottom,0px) + 14px); border:1px solid rgba(201,164,92,.24); outline:1px solid rgba(201,164,92,.09); outline-offset:6px; border-radius:2px; pointer-events:none}
+
+#stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6vw;
+  position: relative;
+}
+
+#line {
+  --reveal: 0%;
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  direction: rtl;
+  unicode-bidi: plaintext;
+  font-size: clamp(1.8rem, 5.8vw, 3.7rem);
+  line-height: 2.5;
+  padding: .75em .5em;
+  color: var(--ink);
+  font-weight: 500;
+  word-spacing: .12em;
+  text-shadow:
+    0 0 1px rgba(255,244,214,.7),
+    0 0 18px rgba(214,172,92,.38),
+    0 0 60px rgba(214,172,92,.16);
+
+  -webkit-mask-image: linear-gradient(
+    to left,
+    #000 0%,
+    #000 var(--reveal),
+    transparent calc(var(--reveal) + 18%)
+  );
+  mask-image: linear-gradient(
+    to left,
+    #000 0%,
+    #000 var(--reveal),
+    transparent calc(var(--reveal) + 18%)
+  );
+
+  transition:
+    opacity .9s ease,
+    filter .9s ease,
+    transform .9s ease;
+}
+
+#line.out {
+  opacity: 0;
+  filter: blur(5px);
+  transform: translateY(-6px);
+}
+
+#menu {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  transition: opacity .6s ease;
+  z-index: 3;
+}
+
+body.started #menu {
+  opacity: 0;
+  pointer-events: none;
+}
+
+button {
+  background: rgba(10,9,8,.75);
+  border: 1px solid rgba(201,164,92,.6);
+  color: var(--gold);
+  border-radius: 999px;
+  min-height: 48px;
+  padding: 8px 28px;
+  font: inherit;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background: rgba(201,164,92,.12);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+#status {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: var(--gold);
+  opacity: .65;
+  font-size: .8rem;
+  pointer-events: none;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: calc(env(safe-area-inset-top, 0px) + 14px)
+         14px
+         calc(env(safe-area-inset-bottom, 0px) + 14px);
+  border: 1px solid rgba(201,164,92,.24);
+  outline: 1px solid rgba(201,164,92,.09);
+  outline-offset: 6px;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  #line {
+    font-size: clamp(1.6rem, 7vw, 2.5rem);
+    line-height: 2.3;
+  }
+}
 </style>
 </head>
+
 <body>
-<div id="stage"><p id="line" aria-live="polite"></p></div>
+
+<div id="stage">
+  <p id="line" aria-live="polite"></p>
+</div>
+
 <div id="menu">
   <button id="start" type="button">شروع کریں</button>
 </div>
+
+<div id="status">شروع کرنے کے لیے بٹن دبائیں</div>
+
 <audio id="song" src="tere pass main.mp3" preload="auto"></audio>
+
 <script>
-const OFFSET = 16;   // shift ALL lines: +1 = everything 1 second later, -1 = 1 second earlier
+// Change this to adjust all lyric timings together.
+// Use 0 when timings already match the audio file.
+const OFFSET = 0;
 
-/* ========= EDIT TIMING HERE =========
-   Each row:  [ start time, "lyric" ]
-   Start time = when that line should begin in the song.
-   Use seconds (12.5) or minutes:seconds ("1:05"). Keep rows in order. */
+// Each row: [start time in seconds, Urdu lyric]
 const LYRICS = [
-  [  16, "جیسے تُو ہے پاس میرے" ],
-  [  21, "تیرے پاس میں" ],
-  [  26, "جیسے شاموں کے سویرے" ],
-  [  30, "تیرے پاس میں" ],
+  [16, "جیسے تُو ہے پاس میرے"],
+  [21, "تیرے پاس میں"],
+  [26, "جیسے شاموں کے سویرے"],
+  [30, "تیرے پاس میں"],
 
-  [  36, "جیسے کاغذ پہ کوئی نظم لکھے" ],
-  [  39, "یا بھولی سی کوئی قسم" ],
+  [36, "جیسے کاغذ پہ کوئی نظم لکھے"],
+  [39, "یا بھولی سی کوئی قسم"],
 
-  [  46, "جیسے پانی پاس پیاسے" ],
-  [  48, "تیرے پاس میں" ],
-  [  57, "جیسے دل کے ہیں دلاسے" ],
-  [  61, "تیرے پاس میں" ],
+  [46, "جیسے پانی پاس پیاسے"],
+  [48, "تیرے پاس میں"],
+  [57, "جیسے دل کے ہیں دلاسے"],
+  [61, "تیرے پاس میں"],
 
-  [  77, "جھوٹ ہے یہ دوریاں" ],
-  [  80, "جھوٹ فاصلہ ہے" ],
-  [  85, "تیرے ساتھ ہی رہوں گا میں" ],
-  [  91, "بات میں، خیال میں" ],
+  [77, "جھوٹ ہے یہ دوریاں"],
+  [80, "جھوٹ فاصلہ ہے"],
+  [85, "تیرے ساتھ ہی رہوں گا میں"],
+  [91, "بات میں، خیال میں"],
 
-  [  96, "جیسے ہونٹوں میں ہو لالی" ],
-  [ 102, "تیرے پاس میں" ],
-  [ 107, "جیسے کانوں میں ہو بالی" ],
-  [ 111, "تیرے پاس میں" ],
+  [96, "جیسے ہونٹوں میں ہو لالی"],
+  [102, "تیرے پاس میں"],
+  [107, "جیسے کانوں میں ہو بالی"],
+  [111, "تیرے پاس میں"],
 
-  [ 117, "جیسے تُو ہے پاس میرے" ],
-  [ 120, "تیرے پاس میں" ],
-  [ 128, "جیسے شاموں کے سویرے" ],
-  [ 131, "تیرے پاس میں" ],
+  [117, "جیسے تُو ہے پاس میرے"],
+  [120, "تیرے پاس میں"],
+  [128, "جیسے شاموں کے سویرے"],
+  [131, "تیرے پاس میں"],
 
-  [ 153, "اپنی کہانی اُتنی رہے گی" ],
-  [ 157, "چاہے بڑھا لو" ],
-  [ 160, "چاہے گھٹا لو" ],
+  [153, "اپنی کہانی اُتنی رہے گی"],
+  [157, "چاہے بڑھا لو"],
+  [160, "چاہے گھٹا لو"],
 
-  [ 162, "کاجل نہیں میں" ],
-  [ 165, "گالوں کا تل ہوں" ],
-  [ 168, "مٹتا نہیں میں، کتنا مٹا لو" ],
+  [162, "کاجل نہیں میں"],
+  [165, "گالوں کا تل ہوں"],
+  [168, "مٹتا نہیں میں، کتنا مٹا لو"],
 
-  [ 173, "میرا تو ہٹنا مشکل بڑا ہے" ],
-  [ 177, "تم سامنے سے شیشہ ہٹا لو" ],
+  [173, "میرا تو ہٹنا مشکل بڑا ہے"],
+  [177, "تم سامنے سے شیشہ ہٹا لو"],
 
-  [ 186, "جیسے آنکھوں کے اشارے" ],
-  [ 190, "تیرے پاس میں" ],
-  [ 196, "جیسے ندیا کے کنارے" ],
-  [ 199, "تیرے پاس میں" ],
+  [186, "جیسے آنکھوں کے اشارے"],
+  [190, "تیرے پاس میں"],
+  [196, "جیسے ندیا کے کنارے"],
+  [199, "تیرے پاس میں"],
 
-  [ 205, "جیسے کاغذ پہ کوئی نظم لکھے" ],
-  [ 209, "یا بھولی سی کوئی قسم" ],
+  [205, "جیسے کاغذ پہ کوئی نظم لکھے"],
+  [209, "یا بھولی سی کوئی قسم"],
 
-  [ 216, "جیسے تُو ہے پاس میرے" ],
-  [ 220, "تیرے پاس میں" ],
-  [ 226, "جیسے شاموں کے سویرے" ],
-  [ 230, "تیرے پاس میں" ]
+  [216, "جیسے تُو ہے پاس میرے"],
+  [220, "تیرے پاس میں"],
+  [226, "جیسے شاموں کے سویرے"],
+  [230, "تیرے پاس میں"]
 ];
-/* ===================================== */
 
-const sec=v=>typeof v==='string'?v.split(':').reduce((a,b)=>a*60+parseFloat(b),0):v;
-const START=LYRICS.map(r=>sec(r[0])+OFFSET), TEXT=LYRICS.map(r=>r[1]);
+const START = LYRICS.map(row => row[0] + OFFSET);
+const TEXT = LYRICS.map(row => row[1]);
 
-const el=document.getElementById('line'), song=document.getElementById('song');
-const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
-const REVEAL=3.6, FADE=.9, LAST_LEN=6;
-let playing=false, cur=-2;
+const el = document.getElementById("line");
+const song = document.getElementById("song");
+const startBtn = document.getElementById("start");
+const status = document.getElementById("status");
 
-function frame(){
-  const t=song.currentTime;
-  let i=-1; for(let k=0;k<START.length;k++){ if(START[k]<=t) i=k; else break; }
-  if(i!==cur){ cur=i; el.classList.remove('out'); el.textContent=i<0?'':TEXT[i]; }
-  if(i>=0){
-    const s=START[i], last=i===START.length-1, n=last?s+LAST_LEN:START[i+1];
-    const dur=Math.max(.5,n-s), local=t-s, rev=Math.min(REVEAL,dur*.6);
-    el.style.setProperty('--p',(ease(Math.min(1,local/rev))*130).toFixed(2));
-    el.classList.toggle('out', local>dur-FADE);
-  }
-  requestAnimationFrame(frame);
+const REVEAL = 3.6;
+const FADE = 0.9;
+const LAST_LEN = 6;
+
+let playing = false;
+let cur = -2;
+let animationStarted = false;
+
+function ease(t) {
+  return t < 0.5
+    ? 2 * t * t
+    : 1 - Math.pow(-2 * t + 2, 2) / 2;
 }
 
-document.getElementById('start').onclick=e=>{
-  e.stopPropagation(); document.body.classList.add('started');
-  (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{
-    song.currentTime=0; const p=song.play(); if(p&&p.catch) p.catch(()=>{});
-    playing=true; frame();
-  });
-};
-document.body.addEventListener('click',()=>{ if(playing) song.paused?song.play():song.pause(); });
-document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
+function frame() {
+  const t = song.currentTime;
+
+  let i = -1;
+
+  for (let k = 0; k < START.length; k++) {
+    if (START[k] <= t) {
+      i = k;
+    } else {
+      break;
+    }
+  }
+
+  if (i !== cur) {
+    cur = i;
+    el.classList.remove("out");
+    el.textContent = i < 0 ? "" : TEXT[i];
+    el.style.setProperty("--reveal", "0%");
+  }
+
+  if (i >= 0) {
+    const s = START[i];
+    const isLast = i === START.length - 1;
+    const next = isLast ? s + LAST_LEN : START[i + 1];
+
+    const duration = Math.max(0.5, next - s);
+    const local = t - s;
+    const revealDuration = Math.min(REVEAL, duration * 0.6);
+
+    const progress = Math.min(1, Math.max(0, local / revealDuration));
+    const reveal = ease(progress) * 100;
+
+    el.style.setProperty("--reveal", reveal.toFixed(2) + "%");
+    el.classList.toggle("out", local > duration - FADE);
+  }
+
+  if (animationStarted) {
+    requestAnimationFrame(frame);
+  }
+}
+
+startBtn.addEventListener("click", async (e) => {
+  e.stopPropagation();
+
+  if (playing) return;
+
+  document.body.classList.add("started");
+  status.textContent = "نظم کے ساتھ۔۔۔";
+
+  try {
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
+
+    song.currentTime = 0;
+    await song.play();
+
+    playing = true;
+
+    if (!animationStarted) {
+      animationStarted = true;
+      requestAnimationFrame(frame);
+    }
+  } catch (error) {
+    status.textContent = "آڈیو فائل چیک کریں: tere pass main.mp3";
+    document.body.classList.remove("started");
+  }
+});
+
+// Tap the background to pause or resume the song.
+document.body.addEventListener("click", async (e) => {
+  if (e.target.closest("button")) return;
+  if (!playing) return;
+
+  if (song.paused) {
+    try {
+      await song.play();
+    } catch (error) {
+      status.textContent = "دوبارہ پلے کرنے کے لیے ٹیپ کریں";
+    }
+  } else {
+    song.pause();
+  }
+});
+
+song.addEventListener("ended", () => {
+  playing = false;
+  status.textContent = "اختتام";
+});
+
+song.addEventListener("error", () => {
+  status.textContent = "آڈیو نہیں ملی — فائل کا نام چیک کریں";
+});
 </script>
+
 </body>
 </html>
